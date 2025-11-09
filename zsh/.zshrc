@@ -2,6 +2,7 @@
 # Following plugins should be installed via Homebrew or other package manager:
 # zsh-autosuggestions
 # zsh-syntax-highlighting
+# zoxide
 
 neofetch
 
@@ -103,3 +104,6 @@ source $ZSH/oh-my-zsh.sh
 source <(ng completion script)
 export PATH="$HOME/.local/bin:$PATH"
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# Load zoxide
+eval "$(zoxide init zsh)"
