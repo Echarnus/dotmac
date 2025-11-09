@@ -1,9 +1,10 @@
+## My .zshrc file
+# Following plugins should be installed via Homebrew or other package manager:
+# zsh-autosuggestions
+# zsh-syntax-highlighting
+
 neofetch
 
-# If you come from bash you migt have to change yhour $PATH.
-# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
-
-# Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
@@ -12,14 +13,6 @@ export ZSH="$HOME/.oh-my-zsh"
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="agnoster"
 
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in $ZSH/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
-
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
 
 # Uncomment the following line to use hyphen-insensitive completion.
 # Case-sensitive completion must be off. _ and - will be interchangeable.
@@ -72,7 +65,7 @@ ZSH_THEME="agnoster"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git dotnet docker docker-compose)
+plugins=(git zsh-autosuggestions dotnet docker docker-compose)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -109,3 +102,4 @@ source $ZSH/oh-my-zsh.sh
 # Load Angular CLI autocompletion.
 source <(ng completion script)
 export PATH="$HOME/.local/bin:$PATH"
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
