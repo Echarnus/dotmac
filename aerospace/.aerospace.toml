@@ -42,6 +42,22 @@ automatically-unhide-macos-hidden-apps = false
 [key-mapping]
     preset = 'qwerty'
 
+[[on-window-detected]]
+if.app-name-regex-substring = 'spotify'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'Microsoft Teams'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'whatsapp'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'proton'
+run = 'layout floating'
+
 # Gaps between windows (inner-*) and between monitor edges (outer-*).
 # Possible values:
 # - Constant:     gaps.outer.top = 8
