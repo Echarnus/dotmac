@@ -60,7 +60,6 @@ Z shell configuration for a powerful command-line experience.
    ```
 
 4. **Apply configurations**
-   ```bash
    # Reload zsh
    source ~/.zshrc
    

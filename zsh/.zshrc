@@ -3,6 +3,7 @@
 # zsh-autosuggestions
 # zsh-syntax-highlighting
 # zoxide
+# lazydocker
 
 neofetch
 
@@ -99,10 +100,12 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+alias ls='ls -gla'
 
 # Load Angular CLI autocompletion.
 source <(ng completion script)
 export PATH="$HOME/.local/bin:$PATH"
+export PATH="$PATH:/Users/kennethdeclercq/.dotnet/tools"
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Load zoxide
