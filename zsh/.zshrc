@@ -4,6 +4,7 @@
 # zsh-syntax-highlighting
 # zoxide
 # lazydocker
+# fzf
 
 neofetch
 
@@ -14,6 +15,12 @@ export ZSH="$HOME/.oh-my-zsh"
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="agnoster"
+
+# Hide git status from agnoster prompt (tmux status bar will show it)
+prompt_git() {
+  # This overrides the agnoster git prompt to show nothing
+}
+
 
 
 # Uncomment the following line to use hyphen-insensitive completion.
@@ -100,13 +107,18 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-alias ls='ls -gla'
+alias ls='ls -Gla'
+alias clr='clear'
+alias py='python3'
 
 # Load Angular CLI autocompletion.
 source <(ng completion script)
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$PATH:/Users/kennethdeclercq/.dotnet/tools"
+
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source <(fzf --zsh)
+
 
 # Load zoxide
 eval "$(zoxide init zsh)"
