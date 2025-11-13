@@ -95,4 +95,34 @@ if cd "$PANE_PATH" && GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null); the
     fi
 fi
 
+# Battery status (always shown, even outside git repos)
+battery_percent=$(pmset -g batt | grep -Eo "\d+%" | cut -d% -f1)
+if [[ -n "$battery_percent" ]]; then
+    # Determine battery icon and color based on percentage
+    if [[ $battery_percent -ge 80 ]]; then
+        battery_icon="🔋"
+        battery_color="${GREEN}"
+    elif [[ $battery_percent -ge 60 ]]; then
+        battery_icon="🔋"
+        battery_color="${GREEN}"
+    elif [[ $battery_percent -ge 40 ]]; then
+        battery_icon="🔋"
+        battery_color="${YELLOW}"
+    elif [[ $battery_percent -ge 20 ]]; then
+        battery_icon="🔋"
+        battery_color="${ORANGE}"
+    else
+        battery_icon="🪫"
+        battery_color="${PURPLE}"
+    fi
+    
+    # Check if charging
+    if pmset -g batt | grep -q "AC Power"; then
+        battery_icon="⚡"
+        battery_color="${BLUE}"
+    fi
+    
+    output+="${SEP}${battery_color} ${battery_icon} ${battery_percent}% ${RESET}${SPACE}"
+fi
+
 echo "$output"
