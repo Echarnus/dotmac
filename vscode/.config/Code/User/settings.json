@@ -1,0 +1,117 @@
+{
+	"workbench.iconTheme": "material-icon-theme",
+	"editor.inlineSuggest.showToolbar": true,
+	"workbench.tree.enableStickyScroll": false,
+	"editor.suggestSelection": "first",
+	"editor.minimap.enabled": false,
+	"editor.inlineSuggest.enabled": true,
+	"material-icon-theme.hidesExplorerArrows": true,
+	"vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+	"window.titleBarStyle": "custom",
+	"git.openRepositoryInParentFolders": "always",
+	"github.copilot.enable": {
+		"*": true,
+		"plaintext": true,
+		"markdown": true,
+		"scminput": false,
+		"yaml": true
+	},
+	"git.autofetch": true,
+	"git.enableSmartCommit": true,
+	"git.confirmSync": false,
+	"javascript.updateImportsOnFileMove.enabled": "always",
+	"workbench.editor.customLabels.enabled": true,
+	"workbench.editor.customLabels.patterns": {
+		"**/*.entra": "${filename}"
+	},
+	"github.copilot.chat.codesearch.enabled": true,
+	"typescript.updateImportsOnFileMove.enabled": "always",
+	"files.exclude": {
+		"**/bin": true,
+		"**/obj": true,
+		"**/dist": true
+	},
+	"editor.codeActionsOnSave": {},
+	"emmet.triggerExpansionOnTab": true,
+	"emmet.includeLanguages": {
+		"javascript": "javascriptreact",
+		"vue-html": "html",
+		"razor": "html",
+		"plaintext": "jade"
+	},
+	"[html]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features"
+	},
+	"[css]": {
+		"editor.defaultFormatter": "vscode.css-language-features"
+	},
+	"[python]": {
+		"editor.formatOnType": true
+	},
+	"angular.forceStrictTemplates": true,
+	"angular.log": "verbose",
+	"typescript.tsserver.experimental.enableProjectDiagnostics": true,
+	"workbench.editor.showTabs": "single",
+	"editor.renderWhitespace": "all",
+	"XLF: Empty": false,
+	"docker.extension.enableComposeLanguageServer": false,
+	"sqldeveloper.sqlHistory.historyLimit": 500,
+	"sqldeveloper.telemetry.enabled": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"notebook.defaultFormatter": "esbenp.prettier-vscode",
+	"[csharp]": {
+		"editor.defaultFormatter": "ms-dotnettools.csharp"
+	},
+	"dotnet.automaticallySyncWithActiveItem": true,
+	"github.copilot.nextEditSuggestions.enabled": true,
+	"chat.mcp.discovery.enabled": {
+		"claude-desktop": true,
+		"windsurf": true,
+		"cursor-global": true,
+		"cursor-workspace": true
+	},
+	"chat.mcp.serverSampling": {
+		"Global in Code: Azure MCP Server": {
+			"allowedDuringChat": true
+		}
+	},
+	"workbench.activityBar.location": "top",
+	"workbench.colorTheme": "Aura Dark",
+	"workbench.colorCustomizations": {
+		"terminal.background": "#00000000"
+	},
+	"workbench.settings.applyToAllProfiles": ["workbench.colorCustomizations", "prettier.bracketSameLine"],
+	"[oracle-sql]": {
+		"editor.defaultFormatter": "Oracle.sql-developer"
+	},
+	"git.replaceTagsWhenPull": true,
+	"[dockercompose]": {
+		"editor.insertSpaces": true,
+		"editor.tabSize": 2,
+		"editor.autoIndent": "advanced",
+		"editor.quickSuggestions": {
+			"other": true,
+			"comments": false,
+			"strings": true
+		},
+		"editor.defaultFormatter": "redhat.vscode-yaml"
+	},
+	"[github-actions-workflow]": {
+		"editor.defaultFormatter": "redhat.vscode-yaml"
+	},
+	"chat.mcp.autostart": "newAndOutdated",
+	"prettier.printWidth": 340,
+	"diffEditor.ignoreTrimWhitespace": false,
+	"github.copilot.chat.languageContext.fix.typescript.enabled": true,
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": true,
+	"dotnet.formatting.organizeImportsOnFormat": true,
+	"prettier.singleAttributePerLine": true,
+	"prettier.singleQuote": true,
+	"prettier.useTabs": true,
+	"prettier.bracketSameLine": true,
+	"settingsSync.ignoredExtensions": []
+}
