@@ -128,7 +128,7 @@ alias ls='ls -Gla'
 alias clr='clear'
 alias py='python3'
 
-alias gfc='git checkout $(git branch --list | fzf | tr -d " *")'
+alias gfz='git checkout $(git branch --list | fzf | tr -d " *")'
 
 
 

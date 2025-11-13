@@ -20,6 +20,13 @@ Z shell configuration for a powerful command-line experience.
 - `.zprofile` - Login shell configuration
 - Uses [Agnoster theme](https://github.com/agnosterj/agnoster-zsh-theme) with git status disabled (shown in tmux instead)
 
+### 📝 Neovim
+LazyVim configuration with modern development features.
+- LazyVim-based setup with automatic plugin management
+- Neo-tree file explorer positioned on the right side
+- Tokyo Night color scheme
+- Full LSP, autocompletion, and syntax highlighting support
+
 ## 🔧 Installation
 
 ### Prerequisites
@@ -67,12 +74,13 @@ Z shell configuration for a powerful command-line experience.
 3. **Create symlinks with Stow**
    ```bash
    # Stow all configurations
-   stow aerospace tmux zsh
+   stow aerospace tmux zsh nvim
    
    # Or stow individual configurations
    stow aerospace
    stow tmux
    stow zsh
+   stow nvim
    ```
 
 4. **Configure your terminal font**
