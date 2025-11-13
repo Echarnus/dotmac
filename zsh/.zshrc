@@ -16,10 +16,8 @@ export ZSH="$HOME/.oh-my-zsh"
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="agnoster"
 
-# Hide git status from agnoster prompt (tmux status bar will show it)
-prompt_git() {
-  # This overrides the agnoster git prompt to show nothing
-}
+# Set your default user (your current username)
+DEFAULT_USER="kennethdeclercq"
 
 
 
@@ -77,6 +75,25 @@ prompt_git() {
 plugins=(git zsh-autosuggestions dotnet docker docker-compose)
 
 source $ZSH/oh-my-zsh.sh
+
+# Custom minimal prompt - overrides agnoster sections (must be AFTER sourcing oh-my-zsh)
+prompt_git() {
+  # Hide git status (tmux status bar shows it)
+}
+
+prompt_dir() {
+  # Hide current directory
+}
+
+prompt_context() {
+  # Only show > for current user, show user@host for SSH or different user
+  if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
+    prompt_segment black default "%(!.%{%F{yellow}%}.)$USER@%m"
+  else
+    # Just show a simple prompt character
+    prompt_segment black default ">"
+  fi
+}
 
 # User configuration
 
