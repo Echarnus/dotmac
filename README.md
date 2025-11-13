@@ -22,10 +22,18 @@ Z shell configuration for a powerful command-line experience.
 
 ### 📝 Neovim
 LazyVim configuration with modern development features.
-- LazyVim-based setup with automatic plugin management
-- Neo-tree file explorer positioned on the right side
-- Tokyo Night color scheme
-- Full LSP, autocompletion, and syntax highlighting support
+- **Configuration files**:
+  - `lua/config/options.lua` - Editor settings (line numbers, clipboard, tabs)
+  - `lua/config/keymaps.lua` - Custom keybindings
+  - `lua/plugins/neo-tree.lua` - File explorer configuration
+  - `lua/plugins/colorscheme.lua` - Theme configuration
+- **Features**:
+  - LazyVim-based setup with automatic plugin management
+  - Neo-tree file explorer positioned on the right side (width: 35)
+  - Tokyo Night color scheme
+  - Full LSP, autocompletion, and syntax highlighting support
+  - Git status integration in file explorer
+  - Relative line numbers with clipboard integration
 
 ## 🔧 Installation
 
