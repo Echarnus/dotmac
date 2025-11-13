@@ -128,6 +128,10 @@ alias ls='ls -Gla'
 alias clr='clear'
 alias py='python3'
 
+alias gfc='git checkout $(git branch --list | fzf | tr -d " *")'
+
+
+
 # Load Angular CLI autocompletion.
 source <(ng completion script)
 export PATH="$HOME/.local/bin:$PATH"
