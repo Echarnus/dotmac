@@ -140,6 +140,12 @@ export PATH="$PATH:/Users/kennethdeclercq/.dotnet/tools"
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source <(fzf --zsh)
 
-
 # Load zoxide
 eval "$(zoxide init zsh)"
+
+# Load custom scripts from dotfiles/scripts
+if [[ -d "$HOME/dotfiles/scripts" ]]; then
+    for script in "$HOME/dotfiles/scripts"/*.sh; do
+        [[ -f "$script" ]] && source "$script"
+    done
+fi
