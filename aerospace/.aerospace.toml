@@ -42,13 +42,13 @@ automatically-unhide-macos-hidden-apps = false
 [key-mapping]
     preset = 'qwerty'
 
-[[on-window-detected]]
-if.app-name-regex-substring = 'spotify'
-run = 'layout floating'
+# [[on-window-detected]]
+# if.app-name-regex-substring = 'spotify'
+# run = 'layout floating'
 
-[[on-window-detected]]
-if.app-name-regex-substring = 'Microsoft Teams'
-run = 'layout floating'
+# [[on-window-detected]]
+# if.app-name-regex-substring = 'Microsoft Teams'
+# run = 'layout floating'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'whatsapp'
@@ -57,6 +57,16 @@ run = 'layout floating'
 [[on-window-detected]]
 if.app-name-regex-substring = 'proton'
 run = 'layout floating'
+
+# Workspace-to-monitor assignment
+# Dedicate workspaces 6-9 to external screens
+# Keep M on native Mac screen
+[workspace-to-monitor-force-assignment]
+6 = 'secondary'
+7 = 'secondary'
+8 = 'secondary'
+9 = 'secondary'
+M = 'main'
 
 # Gaps between windows (inner-*) and between monitor edges (outer-*).
 # Possible values:
@@ -117,7 +127,7 @@ run = 'layout floating'
     alt-k = 'focus up'
     alt-l = 'focus right'
 
-    # See: https://nikitabobko.github.io/AeroSpace/commands#move
+    # See: https://nikitabobko.github.io/AeroSpace/commands#move®
     alt-shift-h = 'move left'
     alt-shift-j = 'move down'
     alt-shift-k = 'move up'
@@ -133,6 +143,10 @@ run = 'layout floating'
     alt-3 = 'workspace 3'
     alt-4 = 'workspace 4'
     alt-5 = 'workspace 5'
+    alt-6 = 'workspace 6'
+    alt-7 = 'workspace 7'
+    alt-8 = 'workspace 8'
+    alt-9 = 'workspace 9'
     alt-m = 'workspace M'
     alt-b = 'workspace B'
     alt-d = 'workspace D'
@@ -143,6 +157,10 @@ run = 'layout floating'
     alt-shift-3 = 'move-node-to-workspace 3'
     alt-shift-4 = 'move-node-to-workspace 4'
     alt-shift-5 = 'move-node-to-workspace 5'
+    alt-shift-6 = 'move-node-to-workspace 6'
+    alt-shift-7 = 'move-node-to-workspace 7'
+    alt-shift-8 = 'move-node-to-workspace 8'
+    alt-shift-9 = 'move-node-to-workspace 9'
     alt-shift-m = 'move-node-to-workspace M'
     alt-shift-b = 'move-node-to-workspace B'
     alt-shift-d = 'move-node-to-workspace D'
