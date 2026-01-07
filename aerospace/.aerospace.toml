@@ -62,12 +62,15 @@ run = 'layout floating'
 # Dedicate workspaces 6-9 to external screens
 # Keep M on native Mac screen
 [workspace-to-monitor-force-assignment]
-4 = ['secondary', 'CU34V5C', 'ASUS VG32VQ1B']
-5 = ['secondary', 'CU34V5C', 'ASUS VG32VQ1B']
-6 = ['secondary', 'CU34V5C', 'ASUS VG32VQ1B']
-7 = ['secondary', 'CU34V5C', 'ASUS VG32VQ1B']
-8 = ['secondary', 'CU34V5C', 'VG248']
-9 = ['secondary', 'CU34V5C','VG248']
+1 = 'Built-in Retina Display'
+2 = 'Built-in Retina Display'
+3 = 'Built-in Retina Display'
+4 = ['CU34V5C', 'ASUS VG32VQ1B']
+5 = ['CU34V5C', 'ASUS VG32VQ1B']
+6 = ['CU34V5C', 'ASUS VG32VQ1B']
+7 = ['CU34V5C', 'ASUS VG32VQ1B']
+8 = ['CU34V5C', 'VG248']
+9 = ['CU34V5C','VG248']
 M = 'Built-in Retina Display'
 
 # Gaps between windows (inner-*) and between monitor edges (outer-*).

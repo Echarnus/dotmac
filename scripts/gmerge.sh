@@ -82,5 +82,5 @@ gmerge() {
         return 1
     fi
 }
-
-gmerge "$@"
+## When sourced from shell startup, don't auto-run.
+## To use as script: `zsh gmerge.sh <branch>` or call `gmerge <branch>` in shell.
