@@ -149,3 +149,6 @@ if [[ -d "$HOME/dotfiles/scripts" ]]; then
         [[ -f "$script" ]] && source "$script"
     done
 fi
+
+# Scaleway CLI autocomplete initialization.
+eval "$(scw autocomplete script shell=zsh)"
