@@ -19,6 +19,41 @@
 #   - fzf (fuzzy finder)
 # ============================================================================
 
+# ----------------------------------------------------------------------------
+# git() — Bearer auth wrapper for Azure DevOps remotes
+#
+# ADO rejects OAuth JWT tokens sent as HTTP Basic auth (credential helper
+# mechanism). The token must be sent as "Authorization: Bearer <token>".
+# This wrapper detects Certia ADO remotes and injects the token automatically.
+# ----------------------------------------------------------------------------
+git() {
+  local remote_url
+  remote_url=$(command git remote get-url origin 2>/dev/null)
+
+  # For git clone the remote is an argument, not yet an 'origin'
+  if [[ -z "$remote_url" ]]; then
+    for arg in "$@"; do
+      if [[ "$arg" == *"certia-vzw.visualstudio.com"* ]]; then
+        remote_url="$arg"
+        break
+      fi
+    done
+  fi
+
+  if [[ "$remote_url" == *"certia-vzw.visualstudio.com"* ]]; then
+    local token
+    token=$(python3 /Users/kennethdeclercq/.azure-certia/get-devops-token.py 2>&1)
+    if [[ -n "$token" ]]; then
+      command git -c "http.https://certia-vzw.visualstudio.com.extraheader=Authorization: Bearer $token" "$@"
+      return $?
+    fi
+    echo "Certia DevOps token unavailable — re-authenticate:" >&2
+    echo "  AZURE_CONFIG_DIR=~/.azure-certia az login --tenant 1798c813-b14b-4f75-b2e9-15179d2f97a4 --allow-no-subscriptions" >&2
+  fi
+
+  command git "$@"
+}
+
 gdev() {
     # ========================================
     # Pre-flight checks
