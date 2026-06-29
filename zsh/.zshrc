@@ -135,6 +135,7 @@ alias gfz='git checkout $(git branch --list | fzf | tr -d " *")'
 # Load Angular CLI autocompletion.
 source <(ng completion script)
 export PATH="$HOME/.local/bin:$PATH"
+export PATH="/opt/homebrew/Caskroom/sqlcl/26.1.0.086.1709/sqlcl/bin:$PATH"
 export PATH="$PATH:/Users/kennethdeclercq/.dotnet/tools"
 
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
@@ -152,3 +153,13 @@ fi
 
 # Scaleway CLI autocomplete initialization.
 eval "$(scw autocomplete script shell=zsh)"
+
+# bun completions
+[ -s "/Users/kennethdeclercq/.bun/_bun" ] && source "/Users/kennethdeclercq/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# direnv: per-directory env vars (e.g. per-tenant AZURE_CONFIG_DIR)
+eval "$(direnv hook zsh)"
