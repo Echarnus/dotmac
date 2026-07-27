@@ -12,13 +12,36 @@ Window management configuration for [AeroSpace](https://github.com/nikitabobko/A
 Terminal multiplexer configuration for enhanced terminal productivity.
 - `.tmux.conf` - Tmux settings and keybindings
 - `.gitmux.conf` - Git status integration for tmux status bar
-- `status-bar.sh` - Custom status bar with technology version detection (󰪮 .NET,  Angular,  React,  Python)
+- `.tmux-status-bar-left.sh` / `.tmux-status-bar-right.sh` - Custom status bar with technology version detection (󰪮 .NET,  Angular,  React,  Python)
 
 ### 🐚 Zsh
 Z shell configuration for a powerful command-line experience.
 - `.zshrc` - Shell configuration, aliases, and functions with Oh My Zsh integration
 - `.zprofile` - Login shell configuration
 - Uses [Agnoster theme](https://github.com/agnosterj/agnoster-zsh-theme) with git status disabled (shown in tmux instead)
+
+### 🤖 Claude Code Skills & Agents
+Personal Claude Code **skills** and **agents** are kept in a **separate private repo**
+— [`Echarnus/Claude`](https://github.com/Echarnus/Claude) — since some skills contain
+company-internal logic. They are **not** stored in this repo; dotmac only references them.
+
+Install (clone the private repo, then symlink each skill/agent into `~/.claude` so
+`git pull` keeps them current):
+
+```bash
+# requires access to the private repo (GitHub auth: `gh auth login`)
+git clone https://github.com/Echarnus/Claude.git ~/Developer/Claude
+mkdir -p ~/.claude/skills ~/.claude/agents
+for d in ~/Developer/Claude/skills/*/; do
+  [ -f "$d/SKILL.md" ] && ln -sfn "$d" ~/.claude/skills/"$(basename "$d")"
+done
+for f in ~/Developer/Claude/agents/*.md; do
+  ln -sfn "$f" ~/.claude/agents/"$(basename "$f")"
+done
+```
+
+Claude Code auto-discovers `~/.claude/skills` and `~/.claude/agents` on start.
+For the **Claude Desktop** app, skills are added via *Customize → Skills* (upload a zip).
 
 ### 📝 Neovim
 LazyVim configuration with modern development features.
