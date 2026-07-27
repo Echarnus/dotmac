@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# editor / swap cruft
+*.swp
+*~
+
+# local dev state (if projects ever live alongside)
+.direnv/
+.devenv/
