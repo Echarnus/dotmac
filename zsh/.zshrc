@@ -6,7 +6,11 @@
 # lazydocker
 # fzf
 
-neofetch
+# System info banner — fastfetch is the maintained successor to neofetch
+# (neofetch was removed from Homebrew). Fall back gracefully; never error.
+if command -v fastfetch >/dev/null 2>&1; then fastfetch
+elif command -v neofetch >/dev/null 2>&1; then neofetch
+fi
 
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -132,8 +136,8 @@ alias gfz='git checkout $(git branch --list | fzf | tr -d " *")'
 
 
 
-# Load Angular CLI autocompletion.
-source <(ng completion script)
+# Load Angular CLI autocompletion (only when ng is available — it's per-project via devenv).
+command -v ng >/dev/null 2>&1 && source <(ng completion script)
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="/opt/homebrew/Caskroom/sqlcl/26.1.0.086.1709/sqlcl/bin:$PATH"
 export PATH="$PATH:/Users/kennethdeclercq/.dotnet/tools"
@@ -151,8 +155,8 @@ if [[ -d "$HOME/dotfiles/scripts" ]]; then
     done
 fi
 
-# Scaleway CLI autocomplete initialization.
-eval "$(scw autocomplete script shell=zsh)"
+# Scaleway CLI autocomplete initialization (only when scw is installed).
+command -v scw >/dev/null 2>&1 && eval "$(scw autocomplete script shell=zsh)"
 
 # bun completions
 [ -s "/Users/kennethdeclercq/.bun/_bun" ] && source "/Users/kennethdeclercq/.bun/_bun"
