@@ -1,32 +1,64 @@
 # dotmac
 
-Personal macOS dotfiles for system configuration and development environment setup.
+Personal macOS dotfiles — the full setup for a fresh MacBook, deployed with [GNU Stow](https://www.gnu.org/software/stow/).
+
+The guiding split:
+
+| Layer | Owner | Why |
+|---|---|---|
+| Host tools (shell, terminal, window manager, GUI apps) | **Homebrew** (`Brewfile`) | One machine-wide version is fine |
+| Per-project toolchains (.NET, node, python, java, …) | **Nix / devenv** per repo | Two projects can pin different versions without conflict |
+| Config files | **This repo** + `stow` | Symlinked into `$HOME`, so `git pull` updates them live |
+
+Nothing language-specific is installed globally. A repo declares its own toolchain in `devenv.nix`, direnv loads it on `cd`, and the tmux status bar reports whatever Nix actually put on `PATH`.
+
+---
 
 ## 📦 What's Included
 
-### 🚀 Aerospace
-Window management configuration for [AeroSpace](https://github.com/nikitabobko/AeroSpace), a tiling window manager for macOS.
-- `.aerospace.toml` - Main configuration file
+Each top-level directory is a **stow package** — its internal layout mirrors `$HOME`.
+
+| Package | Deploys to | Contents |
+|---|---|---|
+| `aerospace` | `~/.aerospace.toml` | Tiling window manager config |
+| `tmux` | `~/.tmux.conf`, `~/.tmux-*.sh`, `~/.gitmux.conf` | Terminal multiplexer + status bar |
+| `zsh` | `~/.zshrc`, `~/.zprofile` | Shell config |
+| `nvim` | `~/.config/nvim/` | LazyVim setup |
+| `vscode` | `~/.config/Code/User/` | Settings, keybindings, extension list |
+| `direnv` | `~/.config/direnv/` | direnv global config + nix-direnv hook |
+| `scripts` | *(sourced in place)* | Shell functions auto-loaded by `.zshrc` |
+| `bin` | *(referenced by path)* | Helper executables |
+
+`scripts/` and `bin/` are **not** stowed — `.zshrc` sources `~/dotfiles/scripts/*.sh` directly, and `bin/nix-toolchain` is invoked by absolute path from the tmux config.
+
+### 🚀 AeroSpace
+Tiling window manager with vim-like keybindings.
+- Workspaces 1–3 pinned to the built-in display, 4–9 to external monitors (`CU34V5C`, `ASUS VG32VQ1B`)
+- Chat and Proton apps (Signal, WhatsApp, Proton*) are forced to **floating** layout
 
 ### 💻 Tmux
-Terminal multiplexer configuration for enhanced terminal productivity.
-- `.tmux.conf` - Tmux settings and keybindings
-- `.gitmux.conf` - Git status integration for tmux status bar
-- `.tmux-status-bar-left.sh` / `.tmux-status-bar-right.sh` - Custom status bar with technology version detection (󰪮 .NET,  Angular,  React,  Python)
+- `.tmux.conf` — settings and keybindings
+- `.gitmux.conf` — git status styling for the pane border
+- `.tmux-status-bar-left.sh` — toolchain versions (see below)
+- `.tmux-status-bar-right.sh` — git status via gitmux
+- `.tmux-battery.sh` — battery indicator in the bottom bar
 
 ### 🐚 Zsh
-Z shell configuration for a powerful command-line experience.
-- `.zshrc` - Shell configuration, aliases, and functions with Oh My Zsh integration
-- `.zprofile` - Login shell configuration
-- Uses [Agnoster theme](https://github.com/agnosterj/agnoster-zsh-theme) with git status disabled (shown in tmux instead)
+Oh My Zsh with the Agnoster theme, deliberately stripped down: directory and git segments are hidden in the prompt because tmux already shows them.
+- Plugins: `git`, `zsh-autosuggestions`, `dotnet`, `docker`, `docker-compose`
+- Aliases: `ls`, `clr`, `py`, `gfz` (fzf branch picker)
+- Integrations: fzf, zoxide, direnv, syntax highlighting, bun, Scaleway and Angular completions
+- Startup is **fail-soft** — every optional tool is guarded by `command -v`, so a missing binary never breaks the shell
+
+### 📝 Neovim
+LazyVim-based, Tokyo Night, Neo-tree pinned right (width 35), full LSP + completion. See `nvim/.config/nvim/QUICKSTART.md`.
+
+### 🧰 Scripts
+- `gdev` (`scripts/azure-devops.sh`) — create a git branch from an Azure DevOps work item assigned to you
+- `gmerge` (`scripts/gmerge.sh`) — checkout a branch, pull, return, and merge
 
 ### 🤖 Claude Code Skills & Agents
-Personal Claude Code **skills** and **agents** are kept in a **separate private repo**
-— [`Echarnus/Claude`](https://github.com/Echarnus/Claude) — since some skills contain
-company-internal logic. They are **not** stored in this repo; dotmac only references them.
-
-Install (clone the private repo, then symlink each skill/agent into `~/.claude` so
-`git pull` keeps them current):
+Kept in a **separate private repo** — [`Echarnus/Claude`](https://github.com/Echarnus/Claude) — since some skills contain company-internal logic. Not stored here; dotmac only references them.
 
 ```bash
 # requires access to the private repo (GitHub auth: `gh auth login`)
@@ -40,161 +72,132 @@ for f in ~/Developer/Claude/agents/*.md; do
 done
 ```
 
-Claude Code auto-discovers `~/.claude/skills` and `~/.claude/agents` on start.
-For the **Claude Desktop** app, skills are added via *Customize → Skills* (upload a zip).
+Claude Code auto-discovers `~/.claude/skills` and `~/.claude/agents` on start. For the **Claude Desktop** app, skills are added via *Customize → Skills* (upload a zip).
 
-### 📝 Neovim
-LazyVim configuration with modern development features.
-- **Configuration files**:
-  - `lua/config/options.lua` - Editor settings (line numbers, clipboard, tabs)
-  - `lua/config/keymaps.lua` - Custom keybindings
-  - `lua/plugins/neo-tree.lua` - File explorer configuration
-  - `lua/plugins/colorscheme.lua` - Theme configuration
-- **Features**:
-  - LazyVim-based setup with automatic plugin management
-  - Neo-tree file explorer positioned on the right side (width: 35)
-  - Tokyo Night color scheme
-  - Full LSP, autocompletion, and syntax highlighting support
-  - Git status integration in file explorer
-  - Relative line numbers with clipboard integration
+---
+
+## ❄️ Nix, devenv & direnv
+
+Per-project toolchains come from [devenv](https://devenv.sh) (backed by [Determinate Nix](https://determinate.systems)), loaded automatically by direnv.
+
+```bash
+# 1. Determinate Nix
+curl -fsSL https://install.determinate.systems/nix | sh -s -- install
+
+# 2. devenv + nix-direnv into the default profile
+nix profile install nixpkgs#devenv nixpkgs#nix-direnv
+```
+
+`direnv/.config/direnv/` (stowed) wires it up:
+- `direnvrc` sources the `nix-direnv` hook, which caches built environments so re-entering a directory is instant instead of re-evaluating
+- `direnv.toml` sets `hide_env_diff = true`, suppressing the `export +AWK +CC +CXX …` wall on every `cd`; the `direnv: loading …` line still shows
+
+Per project:
+
+```bash
+cd ~/Developer/some-project
+devenv init      # writes devenv.nix
+direnv allow     # approve the directory once
+```
+
+Add a language to `devenv.nix` and it appears on `PATH` — **and in the tmux status bar** — with no further wiring.
+
+---
 
 ## 🔧 Installation
 
-### Prerequisites
-- macOS
-- [Homebrew](https://brew.sh/)
-- [GNU Stow](https://www.gnu.org/software/stow/)
-- **Nerd Font** - Required for icons to display properly (recommended: [JetBrainsMono Nerd Font](https://www.nerdfonts.com/))
+### Fresh machine
 
-### Quick Setup
+```bash
+# 1. Homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Echarnus/dotmac.git ~/dotfiles
-   cd ~/dotfiles
-   ```
+# 2. Clone
+git clone https://github.com/Echarnus/dotmac.git ~/dotfiles
+cd ~/dotfiles
 
-2. **Install dependencies**
-   ```bash
-   # Install GNU Stow
-   brew install stow
-   
-   # Install Nerd Font (required for icons)
-   brew install font-jetbrains-mono-nerd-font
-   
-   # Install AeroSpace
-   brew install --cask nikitabobko/tap/aerospace
-   
-   # Install tmux and gitmux
-   brew install tmux
-   brew install arl/arl/gitmux
-   
-   # Install Oh My Zsh (if not already installed)
-   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-   
-   # Install Zsh plugins
-   brew install zsh-autosuggestions
-   brew install zsh-syntax-highlighting
-   brew install zoxide  # Modern cd replacement
-   brew install fzf     # Fuzzy finder
-   
-   # Install neofetch (optional, for system info display)
-   brew install neofetch
-   ```
+# 3. Everything Homebrew owns — CLI tools, GUI apps, the Nerd Font
+brew bundle install --file ~/dotfiles/Brewfile
 
-3. **Create symlinks with Stow**
-   ```bash
-   # Stow all configurations
-   stow aerospace tmux zsh nvim
-   
-   # Or stow individual configurations
-   stow aerospace
-   stow tmux
-   stow zsh
-   stow nvim
-   ```
+# 4. Oh My Zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-4. **Configure your terminal font**
-   - Open iTerm2 (or your terminal) Preferences
-   - Go to Profiles → Text
-   - Set Font to "JetBrainsMono Nerd Font" (or another Nerd Font)
-   - Apply to both "Font" and "Non-ASCII Font"
+# 5. Nix + devenv (see section above)
+curl -fsSL https://install.determinate.systems/nix | sh -s -- install
+nix profile install nixpkgs#devenv nixpkgs#nix-direnv
 
-5. **Apply configurations**
-   ```bash
-   # Reload zsh
-   source ~/.zshrc
-   
-   # Start AeroSpace
-   aerospace start
-   
-   # Start or reload tmux
-   tmux
-   # Or reload existing session: Ctrl+b then r
-   ```
+# 6. Symlink the configs
+cd ~/dotfiles
+stow aerospace tmux zsh nvim vscode direnv
+
+# 7. VS Code extensions
+cat ~/.config/Code/User/extensions.txt | xargs -L 1 code --install-extension
+```
+
+> **Note on step 4:** Oh My Zsh's installer replaces `~/.zshrc`. Run it *before* `stow zsh`, or re-run `stow --restow zsh` afterwards.
+
+### Terminal font
+
+Set the terminal font to **JetBrainsMono Nerd Font** (installed by the Brewfile) for both *Font* and *Non-ASCII Font*. Without it the status bar glyphs render as boxes.
+
+### Apply
+
+```bash
+source ~/.zshrc                    # zsh
+tmux source-file ~/.tmux.conf      # tmux (or Ctrl+b then r)
+aerospace start                    # window manager
+```
+
+---
 
 ## 🔄 Updating
 
-To update your dotfiles:
-
 ```bash
-cd ~/dotfiles
-git pull
+cd ~/dotfiles && git pull
 ```
 
-Reload the respective configuration:
-- Zsh: `source ~/.zshrc`
-- Tmux: `tmux source-file ~/.tmux.conf`
-- AeroSpace: Restart the application
+Symlinked configs are live immediately; reload the relevant tool as above. AeroSpace needs a restart.
 
-## ✨ Features
+After installing a new Homebrew package, re-dump the Brewfile so the next machine gets it:
 
-### Tmux Status Bar
-The custom status bar automatically detects and displays:
-- **Technology versions** with icons:
-  - 󰪮 .NET (searches up to 3 levels deep for `.csproj` files)
-  -  Angular (detects from `angular.json` and `package.json`)
-  -  React (detects from `package.json`)
-  -  Python (detects from `requirements.txt`, `pyproject.toml`, or `setup.py`)
-- **Git status** via gitmux integration
--  **Date and time** with icons
-- Color-coded icons (dimmed) and values (bright/bold) for better visual hierarchy
+```bash
+brew bundle dump --file ~/dotfiles/Brewfile --force --describe
+```
 
-### Zsh Configuration
-- **Oh My Zsh** with Agnoster theme
-- **Plugins**:
-  - `git` - Git aliases and functions
-  - `zsh-autosuggestions` - Fish-like autosuggestions
-  - `dotnet` - .NET CLI completions
-  - `docker` & `docker-compose` - Docker completions
-- **Custom aliases**:
-  - `ls='ls -Gla'` - Detailed colorized listing
-  - `clr='clear'` - Quick clear
-  - `py='python3'` - Python shortcut
-- **Integrations**:
-  - Angular CLI autocompletion
-  - fzf fuzzy finder
-  - zoxide (smart cd)
-  - Syntax highlighting
+---
 
-### AeroSpace
-Tiling window manager for macOS with vim-like keybindings.
+## ✨ The tmux status bar
 
-## 📝 Customization
+Two bars, four scripts.
 
-Feel free to fork this repository and customize the configurations to your needs. Each configuration file is well-commented to help you understand and modify settings.
+### Pane border (top)
 
-### Customizing the Status Bar
-Edit `tmux/status-bar.sh` to:
-- Add more technology detections
-- Change icon colors (modify the color variables at the top)
-- Adjust search depth for project files
-- Add custom status information
+**Left — toolchain versions, read from the loaded Nix environment.**
+
+`.tmux-status-bar-left.sh` delegates to `bin/nix-toolchain`, which resolves versions from the `/nix/store` paths behind the profile's `bin/` symlinks:
+
+```
+❄  ❖ .NET 10  ⬢ node 24  ❯ pwsh 7.6  ☕ jdk 21
+```
+
+This reports **what Nix actually put on `PATH`** — not what a `.csproj`, `global.json`, `Directory.Build.props` or `package.json` claims. It's also a pure filesystem walk with no subprocesses, which matters because tmux re-runs it every 2 seconds.
+
+The `❄` prefix marks the versions as Nix-sourced. Nothing is printed outside a Nix environment.
+
+Recognised tools, in display order: `.NET`, `node`, `bun`, `deno`, `python3`, `ruby`, `go`, `rust`, `java`, `pwsh`, `terraform`, `psql`. Anything the profile doesn't provide is skipped.
+
+**Right —** git status via gitmux (`.tmux-status-bar-right.sh`).
+
+### Bottom bar
+Session name, window list, battery, hostname (only when not on the primary MacBook), date and time.
+
+### Customising
+
+- **Add a tool to the version bar** → append a row to the `tools=()` table in `bin/nix-toolchain`, in the form `binary|label|icon|tmux-colour|version-components`. Run `bin/nix-toolchain` directly (no `--tmux`) to check the output.
+- **Change colours or layout** → `set -g status-*` and `pane-border-format` in `tmux/.tmux.conf`.
+
+---
 
 ## 📄 License
 
-This is a personal configuration repository. Feel free to use anything you find useful!
-
-## 🙏 Acknowledgments
-
-Thanks to the open-source community for the amazing tools that make development on macOS enjoyable.
+Personal configuration repository. Use anything you find useful.

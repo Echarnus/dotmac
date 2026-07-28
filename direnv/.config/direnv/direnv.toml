@@ -1,0 +1,7 @@
+# direnv global config.
+#
+# hide_env_diff drops the `direnv: export +AWK +CC +CXX …` wall of variable names
+# that direnv prints on every `cd` into a devenv directory. The `direnv: loading …`
+# line is kept, so it is still visible that an env was applied.
+[global]
+hide_env_diff = true

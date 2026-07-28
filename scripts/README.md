@@ -4,8 +4,8 @@ This directory contains custom shell scripts that are automatically loaded by `.
 
 ## Scripts Overview
 
-- **`azure-devops.sh`** - Azure DevOps integration for creating branches from work items
-- **`git-aliases.sh`** - Convenient git shortcuts and workflow helpers
+- **`azure-devops.sh`** - Azure DevOps integration for creating branches from work items (`gdev`)
+- **`gmerge.sh`** - Checkout a branch, pull, return to the original branch, and merge (`gmerge`)
 
 ---
 

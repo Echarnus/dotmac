@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+# Report the toolchain provided by the *loaded Nix environment* (devenv or nix-direnv).
+#
+# Versions are read from the store paths behind the profile's bin/ symlinks, so they
+# describe what Nix actually put on PATH — never what a csproj, global.json,
+# Directory.Build.props or package.json claims. It is also a pure filesystem walk:
+# no `dotnet --version` / `pwsh --version` subprocesses, which matters because the
+# tmux pane border re-runs this every 2 seconds.
+#
+# Usage: nix-toolchain [--tmux] [path]
+#   (default)  dotnet 10.0.302 · node 24.18.0 · pwsh 7.6.3 · jdk 21.0.11
+#   --tmux     the same as coloured tmux status-bar segments, versions shortened
+#
+# Prints nothing (exit 0) when no Nix environment is loaded for that path.
+
+set -u
+
+format="line"
+if [[ "${1:-}" == "--tmux" ]]; then
+  format="tmux"
+  shift
+fi
+start="${1:-$PWD}"
+
+# ---------------------------------------------------------------- find profile
+# Inside a devenv shell $DEVENV_PROFILE already points at it. Otherwise (tmux, which
+# runs outside the shell) walk up from the pane's directory to the nearest built env.
+profile=""
+if [[ -n "${DEVENV_PROFILE:-}" && -d "$DEVENV_PROFILE/bin" ]]; then
+  profile="$DEVENV_PROFILE"
+else
+  dir="$(cd "$start" 2>/dev/null && pwd -P)" || exit 0
+  while :; do
+    if [[ -d "$dir/.devenv/profile/bin" ]]; then
+      profile="$dir/.devenv/profile"
+      break
+    fi
+    # plain nix-direnv (`use flake` / `use nix`) keeps its profile under .direnv
+    for candidate in "$dir"/.direnv/flake-profile-* "$dir"/.direnv/nix-profile-*; do
+      if [[ -d "$candidate/bin" ]]; then
+        profile="$candidate"
+        break 2
+      fi
+    done
+    [[ "$dir" == "/" ]] && break
+    dir="${dir%/*}"
+    [[ -z "$dir" ]] && dir="/"
+  done
+fi
+[[ -n "$profile" ]] || exit 0
+
+# ------------------------------------------------------------------- versions
+# /nix/store/<hash>-<pname>-<version>/bin/<x>  ->  <version>
+store_version() {
+  local target base
+  target="$(readlink "$profile/bin/$1" 2>/dev/null)"
+  # some packages install a wrapper file rather than a direct symlink
+  [[ "$target" == /nix/store/* ]] || target="$(readlink -f "$profile/bin/$1" 2>/dev/null)"
+  [[ "$target" == /nix/store/* ]] || return 1
+  base="${target#/nix/store/}"
+  base="${base%%/*}"   # <hash>-<pname>-<version>
+  base="${base#*-}"    # <pname>-<version>
+  [[ "$base" =~ ([0-9][0-9A-Za-z.+_]*)$ ]] || return 1
+  printf '%s' "${BASH_REMATCH[1]}"
+}
+
+# keep the first N dot-separated components of a version
+short_version() {
+  local v="$1" n="$2" out="" i
+  for ((i = 0; i < n; i++)); do
+    out+="${out:+.}${v%%.*}"
+    [[ "$v" == *.* ]] || break
+    v="${v#*.}"
+  done
+  printf '%s' "$out"
+}
+
+# ---------------------------------------------------------------------- table
+# binary | label | icon | tmux colour | components shown in --tmux
+# Order here is the display order; anything the profile does not provide is skipped,
+# so adding a language to devenv.nix is enough to make it appear.
+tools=(
+  "dotnet|.NET|❖|81|1"
+  "node|node|⬢|82|1"
+  "bun|bun|◍|215|2"
+  "deno|deno|◆|82|1"
+  "python3|py|🐍|228|2"
+  "ruby|ruby|◈|203|2"
+  "go|go|◐|81|2"
+  "rustc|rust|⚙|208|2"
+  "java|jdk|☕|167|1"
+  "pwsh|pwsh|❯|69|2"
+  "terraform|tf|⬡|141|2"
+  "psql|pg|◗|110|1"
+)
+
+out=""
+for entry in "${tools[@]}"; do
+  IFS='|' read -r bin label icon colour precision <<< "$entry"
+  version="$(store_version "$bin")" || continue
+  if [[ "$format" == tmux ]]; then
+    out+="#[fg=colour${colour}] ${icon} ${label} $(short_version "$version" "$precision")  "
+  else
+    out+="${out:+ · }${label} ${version}"
+  fi
+done
+
+[[ -n "$out" ]] || exit 0
+
+if [[ "$format" == tmux ]]; then
+  # ❄ marks the versions as coming from the Nix env rather than project manifests
+  printf '#[fg=colour111] ❄ %s' "$out"
+else
+  printf '%s' "$out"
+fi
