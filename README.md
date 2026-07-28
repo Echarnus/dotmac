@@ -92,15 +92,35 @@ nix profile install nixpkgs#devenv nixpkgs#nix-direnv
 - `direnvrc` sources the `nix-direnv` hook, which caches built environments so re-entering a directory is instant instead of re-evaluating
 - `direnv.toml` sets `hide_env_diff = true`, suppressing the `export +AWK +CC +CXX …` wall on every `cd`; the `direnv: loading …` line still shows
 
-Per project:
+Per scope (a scope is a client/project directory under `~/Projects/` holding one or more repos):
 
 ```bash
-cd ~/Developer/some-project
+cd ~/Projects/SomeScope
 devenv init      # writes devenv.nix
 direnv allow     # approve the directory once
 ```
 
 Add a language to `devenv.nix` and it appears on `PATH` — **and in the tmux status bar** — with no further wiring.
+
+### Cloud CLIs are scoped too
+
+`az` and `scw` are **not** installed globally. Each scope declares its own:
+
+```nix
+packages = [ pkgs.azure-cli pkgs.scaleway-cli ];
+```
+
+and pins its credentials to that scope in `.envrc`, so two clients can never read each other's auth state:
+
+```bash
+export AZURE_CONFIG_DIR="$PWD/.azure"
+export SCW_CONFIG_PATH="$PWD/.scw/config.yaml"
+```
+
+Two consequences worth knowing:
+
+- **`gdev` only works inside a scope that provides `az`.** Outside one it exits with a pointer rather than a confusing failure.
+- **Order matters in `.envrc`.** Anything invoking `az` must come *after* `use devenv`, or `command -v az` fails and the branch is silently skipped. Equally, once past `use devenv` the PATH leads with Nix coreutils — so `stat -f %m` (BSD) must be spelled `/usr/bin/stat -f %m`, since GNU `stat` reads `-f` as `--file-system`.
 
 ---
 
@@ -184,7 +204,9 @@ This reports **what Nix actually put on `PATH`** — not what a `.csproj`, `glob
 
 The `❄` prefix marks the versions as Nix-sourced. Nothing is printed outside a Nix environment.
 
-Recognised tools, in display order: `.NET`, `node`, `bun`, `deno`, `python3`, `ruby`, `go`, `rust`, `java`, `pwsh`, `terraform`, `psql`. Anything the profile doesn't provide is skipped.
+Recognised tools, in display order: `.NET`, `node`, `bun`, `deno`, `python3`, `ruby`, `go`, `rust`, `java`, `pwsh`, `terraform`, `az`, `scw`, `psql`. Anything the profile doesn't provide is skipped.
+
+Transitive dependencies show up too — adding `azure-cli` to a scope also puts `py` in the bar, because Nix pulls Python in behind it. That's the script working as intended: it reports what is genuinely on `PATH`, not what the project meant to ask for.
 
 **Right —** git status via gitmux (`.tmux-status-bar-right.sh`).
 

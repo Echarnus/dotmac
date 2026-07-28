@@ -67,8 +67,10 @@ gdev() {
 
     # Check for Azure CLI installation
     if ! command -v az &>/dev/null; then
-        echo "❌ Error: Azure CLI is not installed"
-        echo "   Install with: brew install azure-cli"
+        echo "❌ Error: Azure CLI is not on PATH"
+        echo "   az is project-scoped, not global — cd into a scope that provides it"
+        echo "   (e.g. ~/Projects/Certia), or add it to that scope's devenv.nix:"
+        echo "       packages = [ pkgs.azure-cli ];"
         return 1
     fi
 

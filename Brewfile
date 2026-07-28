@@ -30,11 +30,15 @@ brew "neovim"
 brew "ripgrep"
 brew "gh"                      # GitHub CLI
 brew "direnv"                  # per-directory env; loads devenv shells on cd
-brew "azure-cli"
 brew "hashicorp/tap/terraform"
-brew "scw"                     # Scaleway CLI
 brew "mas"                     # Mac App Store CLI
 brew "displayplacer"           # scriptable display arrangement
+
+# Cloud CLIs are deliberately NOT here. `az` and `scw` are per-project concerns:
+# each scope pins its own version and keeps its own credentials via a scoped
+# AZURE_CONFIG_DIR / SCW_CONFIG_PATH, so two clients can never share auth state.
+# They come from devenv instead — see ~/Projects/<scope>/devenv.nix:
+#   packages = [ pkgs.azure-cli pkgs.scaleway-cli ];
 
 # ------------------------------------------------------------------ window mgmt
 cask "nikitabobko/tap/aerospace" # tiling window manager

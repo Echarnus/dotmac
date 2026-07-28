@@ -155,7 +155,8 @@ if [[ -d "$HOME/dotfiles/scripts" ]]; then
     done
 fi
 
-# Scaleway CLI autocomplete initialization (only when scw is installed).
+# Scaleway CLI autocomplete (only when scw is available — it's per-project via devenv,
+# like ng above, so this is a no-op in a shell started outside a scope that provides it).
 command -v scw >/dev/null 2>&1 && eval "$(scw autocomplete script shell=zsh)"
 
 # bun completions

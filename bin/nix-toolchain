@@ -91,6 +91,8 @@ tools=(
   "java|jdk|☕|167|1"
   "pwsh|pwsh|❯|69|2"
   "terraform|tf|⬡|141|2"
+  "az|az|☁|39|2"
+  "scw|scw|▲|177|2"
   "psql|pg|◗|110|1"
 )
 
