@@ -104,23 +104,19 @@ Add a language to `devenv.nix` and it appears on `PATH` — **and in the tmux st
 
 ### Cloud CLIs are scoped too
 
-`az` and `scw` are **not** installed globally. Each scope declares its own:
+`az` and `scw` are **not** installed globally. Each scope declares only the CLI it actually uses, and pins that CLI's credentials to itself in `.envrc` — so two clients can never read each other's auth state.
 
-```nix
-packages = [ pkgs.azure-cli pkgs.scaleway-cli ];
-```
+| Scope | Cloud | `devenv.nix` | `.envrc` |
+|---|---|---|---|
+| Certia | Azure DevOps | `pkgs.azure-cli` | `AZURE_CONFIG_DIR="$PWD/.azure"` |
+| ProjectPica | Azure | `pkgs.azure-cli` | `AZURE_CONFIG_DIR="$PWD/.azure"` |
+| ClercqIt | Scaleway | `pkgs.scaleway-cli` | `SCW_CONFIG_PATH="$PWD/.scw/config.yaml"` |
 
-and pins its credentials to that scope in `.envrc`, so two clients can never read each other's auth state:
-
-```bash
-export AZURE_CONFIG_DIR="$PWD/.azure"
-export SCW_CONFIG_PATH="$PWD/.scw/config.yaml"
-```
-
-Two consequences worth knowing:
+Three consequences worth knowing:
 
 - **`gdev` only works inside a scope that provides `az`.** Outside one it exits with a pointer rather than a confusing failure.
 - **Order matters in `.envrc`.** Anything invoking `az` must come *after* `use devenv`, or `command -v az` fails and the branch is silently skipped. Equally, once past `use devenv` the PATH leads with Nix coreutils — so `stat -f %m` (BSD) must be spelled `/usr/bin/stat -f %m`, since GNU `stat` reads `-f` as `--file-system`.
+- **Terraform stays global.** nixpkgs marks it unfree since the 1.6 BUSL relicence, and devenv reports that only as an opaque `failed to get drvPath` error. It remains a Homebrew install; scope it with `pkgs.opentofu` (drop-in, still free) if you'd rather.
 
 ---
 
@@ -213,9 +209,29 @@ Transitive dependencies show up too — adding `azure-cli` to a scope also puts 
 ### Bottom bar
 Session name, window list, battery, hostname (only when not on the primary MacBook), date and time.
 
+### The same versions as a shell banner
+
+`bin/nix-toolchain` has three output modes, all driven by the one `tools=()` table:
+
+| Mode | Output |
+|---|---|
+| *(default)* | `.NET 9.0.316 · node 22.23.1 · scw 2.58.3` |
+| `--tmux` | tmux status-bar segments (used by the pane border) |
+| `--powerline` | agnoster-style ANSI segments, for a shell banner |
+
+`--powerline` is what each scope's `devenv.nix` prints on entry, so the toolchain appears in the same visual language as the prompt:
+
+```
+[Clercq.It]  ❄  ❖ .NET 9  ⬢ node 22  ▲ scw 2.58 
+```
+
+Tools that Nix doesn't provide (an npm global, a Homebrew cask) can still join the bar via repeatable `--extra 'icon|label|value|colour'` — Certia uses it for `playwright-cli` and `sqlcl`. An empty value drops its segment, so a tool that isn't installed simply disappears instead of showing blank.
+
+Requires a Nerd Font for the `` separator — the same one the prompt and status bar already need.
+
 ### Customising
 
-- **Add a tool to the version bar** → append a row to the `tools=()` table in `bin/nix-toolchain`, in the form `binary|label|icon|tmux-colour|version-components`. Run `bin/nix-toolchain` directly (no `--tmux`) to check the output.
+- **Add a tool to the version bar** → append a row to the `tools=()` table in `bin/nix-toolchain`, in the form `binary|label|icon|colour|version-components`. It then appears in all three modes at once. Run `bin/nix-toolchain` with no flags to check the output.
 - **Change colours or layout** → `set -g status-*` and `pane-border-format` in `tmux/.tmux.conf`.
 
 ---

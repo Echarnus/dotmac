@@ -7,19 +7,29 @@
 # no `dotnet --version` / `pwsh --version` subprocesses, which matters because the
 # tmux pane border re-runs this every 2 seconds.
 #
-# Usage: nix-toolchain [--tmux] [path]
-#   (default)  dotnet 10.0.302 · node 24.18.0 · pwsh 7.6.3 · jdk 21.0.11
-#   --tmux     the same as coloured tmux status-bar segments, versions shortened
+# Usage: nix-toolchain [--tmux|--powerline] [--extra 'icon|label|value|colour']... [path]
+#   (default)    dotnet 10.0.302 · node 24.18.0 · pwsh 7.6.3 · jdk 21.0.11
+#   --tmux       coloured tmux status-bar segments, versions shortened
+#   --powerline  agnoster-style ANSI segments for a shell banner (devenv enterShell)
+#   --extra      append a segment for a tool Nix does NOT provide (npm global,
+#                Homebrew cask, …) so a scope's banner stays one uniform bar.
+#                Repeatable. Skipped when value is empty, so a missing tool simply
+#                drops out rather than showing as blank.
 #
 # Prints nothing (exit 0) when no Nix environment is loaded for that path.
 
 set -u
 
 format="line"
-if [[ "${1:-}" == "--tmux" ]]; then
-  format="tmux"
-  shift
-fi
+extras=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --tmux)      format="tmux";      shift ;;
+    --powerline) format="powerline"; shift ;;
+    --extra)     extras+=("${2:-}");  shift 2 ;;
+    *)           break ;;
+  esac
+done
 start="${1:-$PWD}"
 
 # ---------------------------------------------------------------- find profile
@@ -97,21 +107,67 @@ tools=(
 )
 
 out=""
+seg_bg=()   # powerline needs each segment's neighbour, so collect before rendering
+seg_txt=()
 for entry in "${tools[@]}"; do
   IFS='|' read -r bin label icon colour precision <<< "$entry"
   version="$(store_version "$bin")" || continue
-  if [[ "$format" == tmux ]]; then
-    out+="#[fg=colour${colour}] ${icon} ${label} $(short_version "$version" "$precision")  "
-  else
-    out+="${out:+ · }${label} ${version}"
-  fi
+  case "$format" in
+    tmux)
+      out+="#[fg=colour${colour}] ${icon} ${label} $(short_version "$version" "$precision")  "
+      ;;
+    powerline)
+      seg_bg+=("$colour")
+      seg_txt+=(" ${icon} ${label} $(short_version "$version" "$precision") ")
+      out="x"   # just a non-empty marker for the guard below
+      ;;
+    *)
+      out+="${out:+ · }${label} ${version}"
+      ;;
+  esac
+done
+
+# Extras describe tools Nix does not provide, so they are appended verbatim rather
+# than looked up in the store. `${extras[@]+…}` guards the empty-array expansion,
+# which is an error under `set -u` on bash 3.2.
+for entry in ${extras[@]+"${extras[@]}"}; do
+  IFS='|' read -r icon label value colour <<< "$entry"
+  [[ -n "${value:-}" ]] || continue
+  case "$format" in
+    tmux)      out+="#[fg=colour${colour}] ${icon} ${label} ${value}  " ;;
+    powerline) seg_bg+=("$colour"); seg_txt+=(" ${icon} ${label} ${value} "); out="x" ;;
+    *)         out+="${out:+ · }${label} ${value}" ;;
+  esac
 done
 
 [[ -n "$out" ]] || exit 0
 
-if [[ "$format" == tmux ]]; then
-  # ❄ marks the versions as coming from the Nix env rather than project manifests
-  printf '#[fg=colour111] ❄ %s' "$out"
-else
-  printf '%s' "$out"
-fi
+case "$format" in
+  tmux)
+    # ❄ marks the versions as coming from the Nix env rather than project manifests
+    printf '#[fg=colour111] ❄ %s' "$out"
+    ;;
+  powerline)
+    # Agnoster-style bar: each segment is a solid background, and the  is drawn in
+    # the *previous* segment's colour on the *next* segment's background so the blocks
+    # interlock. The glyph is written literally rather than as $'' — macOS still
+    # ships bash 3.2, which does not understand \u escapes.
+    esc=$(printf '\033')
+    sep=""
+    fg_dark="${esc}[38;5;232m"   # near-black text; every colour in the table is light
+    line="${esc}[48;5;111m${fg_dark} ❄ "
+    n=${#seg_bg[@]}
+    prev=111
+    for ((i = 0; i < n; i++)); do
+      bg="${seg_bg[i]}"
+      line+="${esc}[48;5;${bg}m${esc}[38;5;${prev}m${sep}${fg_dark}${seg_txt[i]}"
+      prev="$bg"
+    done
+    # close: reset the background first, so the final  fades into the terminal
+    line+="${esc}[49m${esc}[38;5;${prev}m${sep}${esc}[0m"
+    printf '%s' "$line"
+    ;;
+  *)
+    printf '%s' "$out"
+    ;;
+esac
