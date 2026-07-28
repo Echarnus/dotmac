@@ -84,4 +84,13 @@ cask "steam"
 cask "nvidia-geforce-now"
 
 # ------------------------------------------------------------------ mac app store
-mas "Xcode", id: 497799835
+# `brew bundle install` shells out to mas, and mas 7 needs sudo to install into
+# /Applications — so this section prompts for a password and cannot run unattended.
+mas "Xcode",   id: 497799835
+
+# iWork. These are the current *universal* App Store listings; the old Mac-only IDs
+# (Pages 409201541, Numbers 409203825, Keynote 409183694) are retired and now return
+# "No apps found in the App Store for ADAM ID".
+mas "Pages",   id: 361309726
+mas "Numbers", id: 361304891
+mas "Keynote", id: 361285480
