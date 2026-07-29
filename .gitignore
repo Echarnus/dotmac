@@ -8,3 +8,6 @@
 # local dev state (if projects ever live alongside)
 .direnv/
 .devenv/
+
+# agent scratch space (.claude/CLAUDE.md itself is tracked)
+.claude/worktrees/

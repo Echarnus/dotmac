@@ -12,6 +12,10 @@ The guiding split:
 
 Nothing language-specific is installed globally. A repo declares its own toolchain in `devenv.nix`, direnv loads it on `cd`, and the tmux status bar reports whatever Nix actually put on `PATH`.
 
+> **Direction of travel: Nix first.** The table above is where the repo *is*. New config should be declarative in Nix — nix-darwin for system defaults and Homebrew itself, home-manager for user-level settings — with shell scripts and `brew install` as the fallback for the documented exceptions. `bootstrap/` is interim scaffolding on the way there.
+>
+> Working in this repo (as a human or an agent)? See [`AGENTS.md`](AGENTS.md) for conventions: push straight to `main`, commit style, which directories are stowed, and what not to "fix".
+
 ---
 
 ## 📦 What's Included
