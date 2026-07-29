@@ -28,8 +28,9 @@ Each top-level directory is a **stow package** — its internal layout mirrors `
 | `direnv` | `~/.config/direnv/` | direnv global config + nix-direnv hook |
 | `scripts` | *(sourced in place)* | Shell functions auto-loaded by `.zshrc` |
 | `bin` | *(referenced by path)* | Helper executables |
+| `bootstrap` | *(run once by hand)* | macOS defaults + the editor's .NET SDK |
 
-`scripts/` and `bin/` are **not** stowed — `.zshrc` sources `~/dotfiles/scripts/*.sh` directly, and `bin/nix-toolchain` is invoked by absolute path from the tmux config.
+`scripts/`, `bin/` and `bootstrap/` are **not** stowed — `.zshrc` sources `~/dotfiles/scripts/*.sh` directly, `bin/nix-toolchain` is invoked by absolute path from the tmux config, and `bootstrap/` is run manually on a fresh machine.
 
 ### 🚀 AeroSpace
 Tiling window manager with vim-like keybindings.
@@ -56,6 +57,14 @@ LazyVim-based, Tokyo Night, Neo-tree pinned right (width 35), full LSP + complet
 ### 🧰 Scripts
 - `gdev` (`scripts/azure-devops.sh`) — create a git branch from an Azure DevOps work item assigned to you
 - `gmerge` (`scripts/gmerge.sh`) — checkout a branch, pull, return, and merge
+
+### 🩹 Bootstrap
+Run-once setup that config files alone can't express. See `bootstrap/README.md`.
+
+- `macos-defaults.sh` — macOS `defaults write` settings. Currently: **F1–F12 as real function keys**, so media controls move onto `fn`+F-key instead of stealing F2/F5/F12 from the editor. Read at login, so log out and back in.
+- `vscode-dotnet-sdk.sh` — installs Microsoft's signed .NET SDK into `~/.dotnet`, **for VS Code's C# extensions only**.
+
+The second one is the sole exception to *"no language toolchains installed globally"*, and it is a code-signing constraint rather than a preference: C# Dev Kit's server is Microsoft-signed and runs under the macOS hardened runtime, so it cannot `dlopen` the ad-hoc-signed `libhostfxr.dylib` that Nix ships (*"different Team IDs"*, server exits 130). The editor then loses its project system silently — Go to Definition keeps working inside a file but stops working across projects. The SDK is deliberately kept **off `PATH`**, so terminal and CI builds still use the per-repo devenv/Nix SDK and nothing about the build changes.
 
 ### 🤖 Claude Code Skills & Agents
 Kept in a **separate private repo** — [`Echarnus/Claude`](https://github.com/Echarnus/Claude) — since some skills contain company-internal logic. Not stored here; dotmac only references them.
@@ -148,9 +157,15 @@ stow aerospace tmux zsh nvim vscode direnv
 
 # 7. VS Code extensions
 cat ~/.config/Code/User/extensions.txt | xargs -L 1 code --install-extension
+
+# 8. Run-once setup: macOS defaults, and the SDK VS Code's C# extensions need
+~/dotfiles/bootstrap/macos-defaults.sh
+~/dotfiles/bootstrap/vscode-dotnet-sdk.sh
 ```
 
 > **Note on step 4:** Oh My Zsh's installer replaces `~/.zshrc`. Run it *before* `stow zsh`, or re-run `stow --restow zsh` afterwards.
+
+> **Note on step 8:** the function-key change is read at login — log out and back in. And if this machine's home directory differs from the one baked into `vscode/.config/Code/User/settings.json`, fix the two absolute paths under `dotnetAcquisitionExtension.existingDotnetPath`; the setting does not expand `~`.
 
 ### Terminal font
 
