@@ -8,10 +8,12 @@ exactly once (and is safe to re-run later).
 |---|---|
 | `macos-defaults.sh` | macOS system preferences via `defaults write` |
 | `vscode-dotnet-sdk.sh` | Installs Microsoft's signed .NET SDK into `~/.dotnet` for VS Code's C# extensions |
+| `obsidian-vaults.sh` | Points a fresh Obsidian install at the iCloud note vaults |
 
 ```bash
 ~/dotfiles/bootstrap/macos-defaults.sh
 ~/dotfiles/bootstrap/vscode-dotnet-sdk.sh
+~/dotfiles/bootstrap/obsidian-vaults.sh
 ```
 
 ---
@@ -25,6 +27,30 @@ so the media controls move onto `fn`+F-key. Without it every F-key an editor car
 macOS reads this at login, so **log out and back in** afterwards. Flipping it by hand in
 *System Settings → Keyboard → Keyboard Shortcuts → Function Keys* applies immediately if
 you don't want to wait.
+
+---
+
+## `obsidian-vaults.sh`
+
+The vaults live in iCloud Drive at
+`~/Library/Mobile Documents/com~apple~CloudDocs/Notes/` — `ClercqIt` (the second brain),
+`Personal` and `Cooking`. Each already carries its own `.obsidian/` folder, so themes,
+plugins and hotkeys sync down with the notes.
+
+What does **not** sync is Obsidian's list of known vaults. That is machine-local state in
+`~/Library/Application Support/obsidian/obsidian.json`, so a fresh install opens the empty
+vault picker and expects you to find the `com~apple~CloudDocs` path by hand, once per vault.
+This script seeds that file instead — any directory under `Notes/` containing a `.obsidian`
+folder is registered, so a future fourth vault needs no change here.
+
+Two things worth knowing:
+
+- **Quit Obsidian first.** It rewrites `obsidian.json` wholesale on exit, so edits made
+  underneath a running instance vanish when you quit it. The script refuses to run rather
+  than fail silently.
+- **It is a script, not home-manager config**, because `obsidian.json` is mutable state —
+  Obsidian stores window geometry and the last-open vault there. It can be seeded, but it
+  can never be a symlink into a read-only store.
 
 ---
 

@@ -79,6 +79,9 @@ cask "protonvpn"
 # ------------------------------------------------------------------------- other
 cask "figma"
 cask "libreoffice"
+# Second brain. The vaults themselves live in iCloud and are not installed by
+# brew — register them with bootstrap/obsidian-vaults.sh after first launch.
+cask "obsidian"
 cask "spotify"
 cask "steam"
 cask "nvidia-geforce-now"

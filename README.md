@@ -32,7 +32,7 @@ Each top-level directory is a **stow package** — its internal layout mirrors `
 | `direnv` | `~/.config/direnv/` | direnv global config + nix-direnv hook |
 | `scripts` | *(sourced in place)* | Shell functions auto-loaded by `.zshrc` |
 | `bin` | *(referenced by path)* | Helper executables |
-| `bootstrap` | *(run once by hand)* | macOS defaults + the editor's .NET SDK |
+| `bootstrap` | *(run once by hand)* | macOS defaults, the editor's .NET SDK, Obsidian vaults |
 
 `scripts/`, `bin/` and `bootstrap/` are **not** stowed — `.zshrc` sources `~/dotfiles/scripts/*.sh` directly, `bin/nix-toolchain` is invoked by absolute path from the tmux config, and `bootstrap/` is run manually on a fresh machine.
 
