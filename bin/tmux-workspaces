@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Create the standing tmux sessions, one per workspace. Idempotent: sessions that
+# already exist are left alone, so it is safe to run by hand or at every login.
+# Each shell starts in the workspace root, so direnv loads that scope's devenv.
+set -euo pipefail
+
+TMUX_BIN=/opt/homebrew/bin/tmux
+
+# session-name:directory
+SESSIONS=(
+  "Certia:$HOME/Projects/Certia"
+  "Pica:$HOME/Projects/ProjectPica"
+  "HiGenius:$HOME/Projects/HiGenius"
+  "Mac:$HOME/dotfiles"
+)
+
+for entry in "${SESSIONS[@]}"; do
+  name=${entry%%:*}
+  dir=${entry#*:}
+  if [[ ! -d $dir ]]; then
+    echo "skip $name: $dir does not exist" >&2
+    continue
+  fi
+  if "$TMUX_BIN" has-session -t "=$name" 2>/dev/null; then
+    echo "keep $name"
+  else
+    "$TMUX_BIN" new-session -d -s "$name" -c "$dir"
+    echo "created $name"
+  fi
+done

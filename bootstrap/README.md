@@ -9,11 +9,13 @@ exactly once (and is safe to re-run later).
 | `macos-defaults.sh` | macOS system preferences via `defaults write` |
 | `vscode-dotnet-sdk.sh` | Installs Microsoft's signed .NET SDK into `~/.dotnet` for VS Code's C# extensions |
 | `obsidian-vaults.sh` | Points a fresh Obsidian install at the iCloud note vaults |
+| `tmux-launchagent.sh` | Login agent that recreates the tmux sessions (`bin/tmux-workspaces`) after every boot |
 
 ```bash
 ~/dotfiles/bootstrap/macos-defaults.sh
 ~/dotfiles/bootstrap/vscode-dotnet-sdk.sh
 ~/dotfiles/bootstrap/obsidian-vaults.sh
+~/dotfiles/bootstrap/tmux-launchagent.sh
 ```
 
 ---

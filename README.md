@@ -47,6 +47,7 @@ Tiling window manager with vim-like keybindings.
 - `.tmux-status-bar-left.sh` — toolchain versions (see below)
 - `.tmux-status-bar-right.sh` — git status via gitmux
 - `.tmux-battery.sh` — battery indicator in the bottom bar
+- `bin/tmux-workspaces` — creates the `Certia`, `Pica`, `HiGenius` and `Mac` sessions, each rooted in its workspace (idempotent). `bootstrap/tmux-launchagent.sh` runs it at every login; attach with `tmux a -t <name>`
 
 ### 🐚 Zsh
 Oh My Zsh with the Agnoster theme, deliberately stripped down: directory and git segments are hidden in the prompt because tmux already shows them.
