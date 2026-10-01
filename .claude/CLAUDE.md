@@ -7,6 +7,9 @@
 - **Don't use worktrees in this repo.** `AGENTS.md` says push straight to `main`; a worktree
   plus a branch is pure overhead for a single-user config repo. `.claude/worktrees/` is
   scratch space and is gitignored — never commit anything under it.
+- **No branches, also in background sessions.** Work on `main` in `~/dotfiles` and push to
+  `origin main`. If a session forces a worktree, merge it to `main` and push right away —
+  don't leave a `worktree-*` branch behind on the remote.
 - **No PR step.** Finishing a change here means: commit, `git push origin main`, done. Don't
   offer to open a pull request.
 - The `~/dotfiles` checkout is the live one — its files are symlinked into `$HOME`, so an
