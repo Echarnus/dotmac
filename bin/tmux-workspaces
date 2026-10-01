@@ -6,11 +6,11 @@ set -euo pipefail
 
 TMUX_BIN=/opt/homebrew/bin/tmux
 
-# session-name:directory
+# session-name:directory (the main repo inside each workspace; direnv still loads the workspace scope)
 SESSIONS=(
-  "Certia:$HOME/Projects/Certia"
+  "Certia:$HOME/Projects/Certia/CB2.Wallonia"
   "Pica:$HOME/Projects/ProjectPica"
-  "HiGenius:$HOME/Projects/HiGenius"
+  "HiGenius:$HOME/Projects/HiGenius/HiGenius.AI"
   "Mac:$HOME/dotfiles"
 )
 
